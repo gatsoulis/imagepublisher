@@ -1,0 +1,1 @@
+Load images from a directory and publishes them to ROS topic /camera/image_raw. This is the default for normal camera operation.
