@@ -1,0 +1,21 @@
+<package>
+  <description brief="StaticImagePublisher">
+
+     StaticImagePublisher
+
+  </description>
+  <author>Yianni</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/StaticImagePublisher</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="std_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="opencv2"/>
+  <depend package="cv_bridge"/>
+  <depend package="image_transport"/>
+
+</package>
+
+
