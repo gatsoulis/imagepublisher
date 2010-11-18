@@ -13,6 +13,7 @@
 #include "sensor_msgs/Image.h"
 #include "image_transport/image_transport.h"
 #include "cv_bridge/CvBridge.h"
+#include "std_msgs/String.h"
 
 #include <iostream>
 #include <string>
@@ -22,6 +23,7 @@
 #include <opencv/highgui.h>
 #include <ros/ros.h>
 #include <signal.h>
+#include <sstream>
 
 using namespace boost::filesystem;
 using namespace std;
@@ -41,8 +43,11 @@ int main(int argc, char *argv[])
 	sensor_msgs::CvBridge bridge_;
 	image_transport::Publisher image_pub_;
 	image_pub_ = it_.advertise("/camera_sim/image_raw", 1);
+	ros::Publisher strPub = n.advertise<std_msgs::String>("/camera_sim/image_filename", 1, true);
+	std_msgs::String msg;
 	string p(argc <= 1 ? "." : argv[1]);
-	vector<string> filenames;	IplImage *img = NULL;
+	vector<string> filenames;
+	IplImage *img = NULL;
 
 	if (is_directory(p)) {
 		for (directory_iterator itr(p); itr!=directory_iterator(); ++itr)
@@ -67,6 +72,8 @@ int main(int argc, char *argv[])
 				cvWaitKey(2000);
 				try	{
 					image_pub_.publish(bridge_.cvToImgMsg(img, "bgr8"));
+					msg.data = itr->c_str();
+					strPub.publish(msg);
 				} catch (sensor_msgs::CvBridgeException error) {
 					ROS_ERROR("error");
 				}
