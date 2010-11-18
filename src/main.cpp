@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	image_transport::ImageTransport it_(n);
 	sensor_msgs::CvBridge bridge_;
 	image_transport::Publisher image_pub_;
-	image_pub_ = it_.advertise("/camera/image_raw", 1);
+	image_pub_ = it_.advertise("/camera_sim/image_raw", 1);
 	string p(argc <= 1 ? "." : argv[1]);
 	vector<string> filenames;	IplImage *img = NULL;
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 				cout << "Could not load image file: " << itr->c_str() << endl;
 			else {
 				cvShowImage("main", img);
-				cvWaitKey(300);
+				cvWaitKey(2000);
 				try	{
 					image_pub_.publish(bridge_.cvToImgMsg(img, "bgr8"));
 				} catch (sensor_msgs::CvBridgeException error) {
