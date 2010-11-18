@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
 	string p(argc <= 1 ? "." : argv[1]);
 	vector<string> filenames;
 	IplImage *img = NULL;
+	CvFont font;
+	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.5, 0.5);
 
 	if (is_directory(p)) {
 		for (directory_iterator itr(p); itr!=directory_iterator(); ++itr)
@@ -60,7 +62,7 @@ int main(int argc, char *argv[])
 
 	sort(filenames.begin(), filenames.end());
 	cvNamedWindow("main", CV_WINDOW_AUTOSIZE);
-	cvMoveWindow("main", 100, 600);
+	cvMoveWindow("main", 600, 600);
 	signal(SIGINT, ctrlc);
 	for(;;) {
 		for (vector<string>::iterator itr = filenames.begin(); itr != filenames.end(); ++itr) {
@@ -68,8 +70,6 @@ int main(int argc, char *argv[])
 			if(!img)
 				cout << "Could not load image file: " << itr->c_str() << endl;
 			else {
-				cvShowImage("main", img);
-				cvWaitKey(2000);
 				try	{
 					image_pub_.publish(bridge_.cvToImgMsg(img, "bgr8"));
 					msg.data = itr->c_str();
@@ -77,6 +77,9 @@ int main(int argc, char *argv[])
 				} catch (sensor_msgs::CvBridgeException error) {
 					ROS_ERROR("error");
 				}
+				cvPutText(img, itr->c_str(), cvPoint(200, 290), &font, cvScalar(0, 255, 0, 0));
+				cvShowImage("main", img);
+				cvWaitKey(3000);
 				cvReleaseImage(&img);
 			}
 		}
