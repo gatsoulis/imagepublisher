@@ -28,6 +28,8 @@
 using namespace boost::filesystem;
 using namespace std;
 
+int cvDelay = 200;
+
 void ctrlc(int s)
 {
 	cout << "ctrl-c pressed" << endl;
@@ -79,7 +81,7 @@ int main(int argc, char *argv[])
 				}
 				cvPutText(img, itr->c_str(), cvPoint(200, 290), &font, cvScalar(0, 255, 0, 0));
 				cvShowImage("main", img);
-				cvWaitKey(3000);
+				cvWaitKey(cvDelay);
 				cvReleaseImage(&img);
 			}
 		}
