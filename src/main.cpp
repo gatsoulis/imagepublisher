@@ -28,7 +28,7 @@
 using namespace boost::filesystem;
 using namespace std;
 
-int cvDelay = 200;
+int cvDelay = 500;
 
 void ctrlc(int s)
 {
