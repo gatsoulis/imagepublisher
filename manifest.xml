@@ -1,13 +1,13 @@
 <package>
-  <description brief="StaticImagePublisher">
+  <description brief="Static_Image_Publisher">
 
-     StaticImagePublisher
+     Static_Image_Publisher
 
   </description>
   <author>Yianni</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/StaticImagePublisher</url>
+  <url>http://ros.org/wiki/Static_Image_Publisher</url>
   <depend package="roscpp"/>
   <depend package="rospy"/>
   <depend package="std_msgs"/>

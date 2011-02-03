@@ -13,6 +13,7 @@
 #include "sensor_msgs/Image.h"
 #include "image_transport/image_transport.h"
 #include "cv_bridge/CvBridge.h"
+#include "std_msgs/String.h"
 
 #include <iostream>
 #include <string>
@@ -22,9 +23,12 @@
 #include <opencv/highgui.h>
 #include <ros/ros.h>
 #include <signal.h>
+#include <sstream>
 
 using namespace boost::filesystem;
 using namespace std;
+
+int cvDelay = 500;
 
 void ctrlc(int s)
 {
@@ -35,14 +39,19 @@ void ctrlc(int s)
 
 int main(int argc, char *argv[])
 {
-	ros::init(argc, argv, "StaticImagePublisher");
+	ros::init(argc, argv, "Static_Image_Publisher");
 	ros::NodeHandle n;
 	image_transport::ImageTransport it_(n);
 	sensor_msgs::CvBridge bridge_;
 	image_transport::Publisher image_pub_;
-	image_pub_ = it_.advertise("/camera/image_raw", 1);
+	image_pub_ = it_.advertise("/camera_sim/image_raw", 1);
+	ros::Publisher strPub = n.advertise<std_msgs::String>("/camera_sim/image_filename", 1, true);
+	std_msgs::String msg;
 	string p(argc <= 1 ? "." : argv[1]);
-	vector<string> filenames;	IplImage *img = NULL;
+	vector<string> filenames;
+	IplImage *img = NULL;
+	CvFont font;
+	cvInitFont(&font, CV_FONT_HERSHEY_SIMPLEX, 0.5, 0.5);
 
 	if (is_directory(p)) {
 		for (directory_iterator itr(p); itr!=directory_iterator(); ++itr)
@@ -55,7 +64,7 @@ int main(int argc, char *argv[])
 
 	sort(filenames.begin(), filenames.end());
 	cvNamedWindow("main", CV_WINDOW_AUTOSIZE);
-	cvMoveWindow("main", 100, 600);
+	cvMoveWindow("main", 600, 600);
 	signal(SIGINT, ctrlc);
 	for(;;) {
 		for (vector<string>::iterator itr = filenames.begin(); itr != filenames.end(); ++itr) {
@@ -63,13 +72,16 @@ int main(int argc, char *argv[])
 			if(!img)
 				cout << "Could not load image file: " << itr->c_str() << endl;
 			else {
-				cvShowImage("main", img);
-				cvWaitKey(300);
 				try	{
 					image_pub_.publish(bridge_.cvToImgMsg(img, "bgr8"));
+					msg.data = itr->c_str();
+					strPub.publish(msg);
 				} catch (sensor_msgs::CvBridgeException error) {
 					ROS_ERROR("error");
 				}
+				cvPutText(img, itr->c_str(), cvPoint(200, 290), &font, cvScalar(0, 255, 0, 0));
+				cvShowImage("main", img);
+				cvWaitKey(cvDelay);
 				cvReleaseImage(&img);
 			}
 		}
