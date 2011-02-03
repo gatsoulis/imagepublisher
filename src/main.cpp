@@ -39,7 +39,7 @@ void ctrlc(int s)
 
 int main(int argc, char *argv[])
 {
-	ros::init(argc, argv, "StaticImagePublisher");
+	ros::init(argc, argv, "Static_Image_Publisher");
 	ros::NodeHandle n;
 	image_transport::ImageTransport it_(n);
 	sensor_msgs::CvBridge bridge_;
