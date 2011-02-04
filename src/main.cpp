@@ -28,8 +28,6 @@
 using namespace boost::filesystem;
 using namespace std;
 
-int cvDelay = 500;
-
 void ctrlc(int s)
 {
 	cout << "ctrl-c pressed" << endl;
@@ -47,7 +45,9 @@ int main(int argc, char *argv[])
 	image_pub_ = it_.advertise("/camera_sim/image_raw", 1);
 	ros::Publisher strPub = n.advertise<std_msgs::String>("/camera_sim/image_filename", 1, true);
 	std_msgs::String msg;
-	string p(argc <= 1 ? "." : argv[1]);
+	int cvDelay = (argc == 2 ? atoi(argv[1]) : 500);
+	cout << "Change time between images is: " << cvDelay << " ms" << endl;
+	string p(argc == 3 ? argv[2] : ".");
 	vector<string> filenames;
 	IplImage *img = NULL;
 	CvFont font;
