@@ -4,3 +4,5 @@ include/
 msg_gen/
 msg/lisp/
 images/
+ignore/
+*.png
