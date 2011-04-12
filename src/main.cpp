@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <sstream>
 #include <boost/program_options.hpp>
+#include <climits>
 
 using namespace boost::filesystem;
 namespace po = boost::program_options;
@@ -42,25 +43,29 @@ int main(int argc, char *argv[])
 	string p = "./"; //(argc == 3 ? argv[2] : ".");
 	po::options_description desc("Allowed options");
 	desc.add_options()
-	    ("help", "produce help message")
-	    ("delay", po::value<int>(), "set delay for image wait")
-	    ("dir", po::value<string>(), "the directory path");
+	    				("help", "produce help message")
+	    				("delay", po::value<int>(), "set delay for image wait")
+	    				("dir", po::value< vector<string> >(), "the directory path")
+	    				("epochs", po::value<unsigned long long int>(), "number of epochs");
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
 	if (vm.count("help")) {
-	    cout << desc << "\n";
-	    return 1;
+		cout << desc << "\n";
+		return 1;
 	}
 
 	int cvDelay = vm.count("delay") ? vm["delay"].as<int>() : 500;
-	cout << "Change time between images is: " << cvDelay << " ms" << endl;
+	cout << "Delay: " << cvDelay << " ms" << endl;
 
 	if (vm.count("dir"))
 		p.assign(vm["dir"].as< vector<string> >()[0].c_str());
 	cout << "Dir: " << p.c_str() << endl;
+
+	unsigned long long int epochs = vm.count("epochs") ? vm["epochs"].as<unsigned long long int>() : ULLONG_MAX;
+	cout << "Epochs: " << epochs << endl;
 
 	ros::init(argc, argv, "Static_Image_Publisher");
 	ros::NodeHandle n;
@@ -78,16 +83,16 @@ int main(int argc, char *argv[])
 	cvNamedWindow("main", CV_WINDOW_AUTOSIZE);
 	cvMoveWindow("main", 600, 600);
 	signal(SIGINT, ctrlc);
-	for(;;) {
-      if (is_directory(p)) {
-		for (directory_iterator itr(p); itr!=directory_iterator(); ++itr)
-          if (is_regular_file(itr->status())) {
-            string str(itr->path().file_string());
-            filenames.push_back(str);
-          }
-      } else
-		ROS_ERROR("error reading directory");
-      sort(filenames.begin(), filenames.end());
+	for(unsigned long long int i=0; i<epochs; i++) {
+		if (is_directory(p)) {
+			for (directory_iterator itr(p); itr!=directory_iterator(); ++itr)
+				if (is_regular_file(itr->status())) {
+					string str(itr->path().file_string());
+					filenames.push_back(str);
+				}
+		} else
+			ROS_ERROR("error reading directory");
+		sort(filenames.begin(), filenames.end());
 
 		for (vector<string>::iterator itr = filenames.begin(); itr != filenames.end(); ++itr) {
 			img = cvLoadImage(itr->c_str());
@@ -109,6 +114,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-    ros::spin();
+	//ros::spin();
 	return 0;
 }
